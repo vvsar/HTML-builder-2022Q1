@@ -72,9 +72,7 @@ fs.readFile(templatePath, (error, data) => {
   HTMLWriteStream.write(HTMLArray[0]);
   for (let i = 1; i < HTMLArray.length; i += 2) {
     const componentPath = path.join(__dirname, `/components/${HTMLArray[i]}.html`);
-    fs.appendFile(componentPath, HTMLArray[i + 1], (error) => {
-      console.log(error);
-    });
+    
     fs.readFile(componentPath, (error, data) => {
       if (error) {
         console.log(error);

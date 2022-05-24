@@ -9,23 +9,19 @@ const farewell = 'Thank you! Have a nice day!\n';
 const rl = readline.createInterface({ input, output });
 const writer = fs.createWriteStream(path.join(__dirname, 'text.txt'));
 
-rl.on('line', (text) => {
-  writer.write(`${text}\n`);
-});
-
 process.on('exit', () => {
   output.write(farewell);
 });
 
+process.on('SIGINT', () => {
+  process.exit();
+});
+
 output.write(welcome);
 
-input.on('text', (text) => {
+rl.on('line', (text) => {
   if (text.toString().trim() === 'exit') {
     process.exit();
   }
-  output.write(text);
-});
-
-process.on('SIGINT', () => {
-  process.exit();
+  writer.write(`${text}\n`);
 });
