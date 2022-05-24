@@ -60,80 +60,26 @@ fs.readdir(stylesDirPath, { withFileTypes: true }, (error, files) => {
   });
 });
 
-// const HTMLWriteStream = fs.createWriteStream(targetDirPath + '/index.html');
 const templatePath = path.join(__dirname, '/template.html');
 const targetHTMLPath = path.join(targetDirPath, '/index.html');
 
-fs.readFile(templatePath, (error, data) => {
+fs.readFile(templatePath, 'utf-8', (error, data) => {
   if (error) {
     console.log(error);
     return;
   }
-  const HTMLArray = data.toString().split(/{{|}}/);
+  let templateData = data;
+  const tagsToReplace = data.match(/{{\w+}}/gm);
 
-  for (let i = 0; i < HTMLArray.length; i++) {
-    if (i % 2 === 0) {
-      // console.log(HTMLArray[i]);
-      fs.appendFile(targetHTMLPath, HTMLArray[i], (error) => {
-        if (error) {
-          return console.log(error);
-        }
-      });
-    } else {
-      const componentPath = path.join(__dirname, `/components/${HTMLArray[i]}.html`);
-    
-      fs.readFile(componentPath, (error, data) => {
-        if (error) {
-          console.log(error);
-          return;
-        }
-        // console.log(data.toString());
-        fs.appendFile(targetHTMLPath, data.toString(), (error) => {
-          if (error) {
-            return console.log(error);
-          }
-        });
-      });
-    }
+  for (let tag of tagsToReplace) {
+    const tagPath = path.join(__dirname, '/components', `${tag.slice(2, -2)}.html`,);
+
+    fs.readFile(tagPath, 'utf-8', (error, tagData) => {
+      if (error) console.log(error);
+
+      templateData = templateData.replace(tag, tagData);
+      const indexHTMLWriteStream = fs.createWriteStream(targetHTMLPath);
+      indexHTMLWriteStream.write(templateData);
+    });
   }
 });
-
-
-// fs.readFile(templatePath, (error, data) => {
-//   if (error) {
-//     console.log(error);
-//     return;
-//   }
-//   const HTMLArray = data.toString().split(/{{|}}/);
-
-//   for (let i = 0; i < HTMLArray.length; i++) {
-//     if (i % 2 === 0) {
-//       HTMLWriteStream.write(HTMLArray[i]);
-//     } else {
-//       const componentPath = path.join(__dirname, `/components/${HTMLArray[i]}.html`);
-    
-//       fs.readFile(componentPath, (error, data) => {
-//         if (error) {
-//           console.log(error);
-//           return;
-//         }
-     
-//         HTMLWriteStream.write(data);
-//       });
-//     }
-//   }
-// });
-
-
-
-
-
-
-
-  
-  
-   
-    
-
-
-
