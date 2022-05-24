@@ -60,8 +60,9 @@ fs.readdir(stylesDirPath, { withFileTypes: true }, (error, files) => {
   });
 });
 
-const HTMLWriteStream = fs.createWriteStream(targetDirPath + '/index.html');
+// const HTMLWriteStream = fs.createWriteStream(targetDirPath + '/index.html');
 const templatePath = path.join(__dirname, '/template.html');
+const targetHTMLPath = path.join(targetDirPath, '/index.html');
 
 fs.readFile(templatePath, (error, data) => {
   if (error) {
@@ -69,21 +70,70 @@ fs.readFile(templatePath, (error, data) => {
     return;
   }
   const HTMLArray = data.toString().split(/{{|}}/);
-  HTMLWriteStream.write(HTMLArray[0]);
-  for (let i = 1; i < HTMLArray.length; i += 2) {
-    const componentPath = path.join(__dirname, `/components/${HTMLArray[i]}.html`);
-    
-    fs.readFile(componentPath, (error, data) => {
-      if (error) {
-        console.log(error);
-        return;
-      }
-        
-      HTMLWriteStream.write(data);
-    });
-  }
 
+  for (let i = 0; i < HTMLArray.length; i++) {
+    if (i % 2 === 0) {
+      // console.log(HTMLArray[i]);
+      fs.appendFile(targetHTMLPath, HTMLArray[i], (error) => {
+        if (error) {
+          return console.log(error);
+        }
+      });
+    } else {
+      const componentPath = path.join(__dirname, `/components/${HTMLArray[i]}.html`);
+    
+      fs.readFile(componentPath, (error, data) => {
+        if (error) {
+          console.log(error);
+          return;
+        }
+        // console.log(data.toString());
+        fs.appendFile(targetHTMLPath, data.toString(), (error) => {
+          if (error) {
+            return console.log(error);
+          }
+        });
+      });
+    }
+  }
 });
+
+
+// fs.readFile(templatePath, (error, data) => {
+//   if (error) {
+//     console.log(error);
+//     return;
+//   }
+//   const HTMLArray = data.toString().split(/{{|}}/);
+
+//   for (let i = 0; i < HTMLArray.length; i++) {
+//     if (i % 2 === 0) {
+//       HTMLWriteStream.write(HTMLArray[i]);
+//     } else {
+//       const componentPath = path.join(__dirname, `/components/${HTMLArray[i]}.html`);
+    
+//       fs.readFile(componentPath, (error, data) => {
+//         if (error) {
+//           console.log(error);
+//           return;
+//         }
+     
+//         HTMLWriteStream.write(data);
+//       });
+//     }
+//   }
+// });
+
+
+
+
+
+
+
+  
+  
+   
+    
 
 
 
